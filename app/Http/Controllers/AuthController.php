@@ -38,6 +38,40 @@ class AuthController extends Controller
         return response()->json([
           'status_code' => 500,
           'message' => 'Server Error',
+          $error
+        ]);
+      }
+    }
+
+    public function register(Request $request)
+    {
+      try {
+        $request->validate([
+          'first_name' => 'string',
+          'last_name' => 'string',
+          'email' => 'email|required',
+          'password' => 'required'
+        ]);
+        $credentials = request(['first_name','last_name','email', 'password']);
+        if(User::Where('email',$credentials->email)) throw new \Exception('Email already exists');
+
+        $user = new User();
+        $user->fill($request->all());
+        $user->password = Hash::make($credentials->password);
+        $user->save();
+
+        $tokenResult = $user->createToken('authToken')->plainTextToken;
+
+        return response()->json([
+          'status_code' => 200,
+          'access_token' => $tokenResult,
+          'token_type' => 'Bearer',
+        ]);
+      } catch (Exception $error) {
+        return response()->json([
+          'status_code' => 500,
+          'message' => 'Server Error',
+          $error
         ]);
       }
     }
