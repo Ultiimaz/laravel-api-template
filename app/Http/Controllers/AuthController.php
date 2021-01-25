@@ -26,7 +26,7 @@ class AuthController extends Controller
         }
         $user = User::where('email', $request->email)->first();
         if ( ! Hash::check($request->password, $user->password, [])) {
-           throw new \Exception('Error in Login');
+           throw new Exception('Error in Login');
         }
         $tokenResult = $user->createToken('authToken')->plainTextToken;
         return response()->json([
@@ -38,7 +38,7 @@ class AuthController extends Controller
         return response()->json([
           'status_code' => 500,
           'message' => 'Server Error',
-          $error
+           $error
         ]);
       }
     }
@@ -52,12 +52,12 @@ class AuthController extends Controller
           'email' => 'email|required',
           'password' => 'required'
         ]);
-        $credentials = request(['first_name','last_name','email', 'password']);
-        if(User::Where('email',$credentials->email)) throw new \Exception('Email already exists');
+
+        if(User::Where('email',$request->email)->count() > 0) throw new Exception('Email already exists');
 
         $user = new User();
         $user->fill($request->all());
-        $user->password = Hash::make($credentials->password);
+        $user->password = Hash::make($request->password);
         $user->save();
 
         $tokenResult = $user->createToken('authToken')->plainTextToken;

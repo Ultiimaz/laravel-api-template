@@ -40,7 +40,11 @@ class RouteServiceProvider extends ServiceProvider
         $this->routes(function (){
             $route = Route::middleware('api');
 
-            if(env('APP_DOMAIN',null)) $route->domain(env('APP_DOMAIN'));
+            if(env('APP_DOMAIN'))
+                $route->domain(env('APP_DOMAIN'));
+            else
+                $route->prefix('api');
+
 
             $route
             ->namespace($this->namespace)
